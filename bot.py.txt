@@ -4,7 +4,7 @@ from telegram.ext import ApplicationBuilder, ContextTypes, MessageHandler, Comma
 from groq import Groq
 
 # 1. API Tokenlar
-TELEGRAM_BOT_TOKEN = "8754772236:AAEpfusKzFL_rliURwv7rMWgDgGWE3q9NWc"
+TELEGRAM_BOT_TOKEN = "8754772236:AAHbIJizMokJ8NSiYH5OwufAtrkC9rrLEXc"
 GROQ_API_KEY = "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"  # <-- Groq'dan olgan bepul kalitingizni shu yerga qo'ying
 
 client = Groq(api_key=GROQ_API_KEY)
