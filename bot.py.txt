@@ -1,0 +1,76 @@
+import logging
+from telegram import Update
+from telegram.ext import ApplicationBuilder, ContextTypes, MessageHandler, CommandHandler, filters
+from groq import Groq
+
+# 1. API Tokenlar
+TELEGRAM_BOT_TOKEN = "8754772236:AAEpfusKzFL_rliURwv7rMWgDgGWE3q9NWc"
+GROQ_API_KEY = "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"  # <-- Groq'dan olgan bepul kalitingizni shu yerga qo'ying
+
+client = Groq(api_key=GROQ_API_KEY)
+
+# 2. Usta-Dasturchi va Servis Xizmatlari xotirasi
+SYSTEM_PROMPT = """
+Siz telefonlarni dasturiy va texnik ta'mirlash bo'yicha professional Usta-Dasturchining (Phone Software & Hardware Engineer) xushmuomala AI yordamchisiz.
+O'zbek tilida ravon, tushunarli va professional muloqot qiling.
+
+MANZIL VA ALOQA:
+- Manzil: Farg'ona shahar, Sentr, eski Askiya oldi, Artel Telefon Majmuasi (Vatan ravnaqi 6-uy).
+- Murojaat va Usta kontaktlari: +998 90 536 49 49 | Telegram: @ozodbek_abdullaev
+
+XIZMATLAR VA TAXMINIY NARXLAR:
+1. Dasturiy xizmatlar (Software):
+   - Android va iPhone proshivka qilish, menyuni o'zbekcha/ruscha qilish — 50,000 - 100,000 so'm
+   - Google Account (FRP), Mi Account, Samsung Account blokdan chiqarish — 80,000 - 200,000 so'm
+   - iPhone iCloud / Passcode / Unlocked muammolarini hal qilish — Modelga qarab kelishiladi
+   - Telefonda o'chib ketgan ma'lumotlarni qaytarib berish (Data Recovery) — 100,000 so'mdan boshlab
+   - Bootloop (telefon yonib-o me'morida qolishi) tuzatish — 80,000 - 150,000 so'm
+
+2. Texnik ta'mirlash (Hardware / Plata):
+   - Plata (Motherboard) ustida mikro-payka va chip almashtirish
+   - Zaryadga olmaslik, qizib ketish yoki suv tushgan telefonlarni tuzatish
+   - Ekran va batareya almashtirish
+
+VAZIFANGIZ:
+1. Mijozning telefoni qanday rusumda va qanday muammoga duch kelganini so'rang.
+2. Taxminiy narx va ish vaqtini ayting.
+3. Do'kon manzilini ko'rsating va usta @ozodbek_abdullaev bilan bog'lanishini tavsiya qiling.
+
+TAQIQLANADI: Telefon sotish yoki aksessuar sotish haqida gapirish. Faqat TELEFON TA'MIRLASH VA DASTURIY XIZMATLAR haqida gapiring!
+"""
+
+logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO)
+
+async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    user_name = update.effective_user.first_name
+    await update.message.reply_text(
+        f"Assalomu alaykum, {user_name}! 👋\n\n"
+        f"Men **Telefonlarni dasturiy sozlash va ta'mirlash (Software & Service)** bo'yicha AI yordamchisiman.\n\n"
+        f"Telefonda qanday muammo yuz berdi?"
+    )
+
+async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    user_text = update.message.text
+
+    try:
+        response = client.chat.completions.create(
+            model="llama-3.3-70b-versatile",
+            messages=[
+                {"role": "system", "content": SYSTEM_PROMPT},
+                {"role": "user", "content": user_text}
+            ]
+        )
+        ai_reply = response.choices[0].message.content
+        await update.message.reply_text(ai_reply)
+
+    except Exception as e:
+        logging.error(f"Xatolik: {e}")
+        await update.message.reply_text("Ulanishda texnik xatolik bo'ldi.")
+
+if __name__ == '__main__':
+    app = ApplicationBuilder().token(TELEGRAM_BOT_TOKEN).build()
+    app.add_handler(CommandHandler("start", start))
+    app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
+    
+    print("Telefon Dasturchisi AI Boti (Groq) ishga tushdi...")
+    app.run_polling()
