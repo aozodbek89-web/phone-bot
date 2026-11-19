@@ -1,0 +1,39 @@
+{
+  "shop": {
+    "name": "Artel Phone",
+    "tagline": "Premium smartfonlar va professional servis",
+    "address": "Farg'ona sh., Sentr, eski Askiya oldi, Artel Telefon Majmuasi (Vatan ravnaqi 6-uy)",
+    "phone": "+998905364949",
+    "telegram": "ozodbek_abdullaev"
+  },
+  "categories": [
+    {"id": "all", "name": "Hammasi"},
+    {"id": "apple", "name": "Apple"},
+    {"id": "samsung", "name": "Samsung"},
+    {"id": "xiaomi", "name": "Xiaomi"},
+    {"id": "acc", "name": "Aksessuarlar"}
+  ],
+  "products": [
+    {"id": "ip16pm", "cat": "apple", "type": "phone", "name": "iPhone 16 Pro Max", "price": 17900000, "old": 18900000, "badge": "Yangi", "colors": ["#c9b29b", "#6e5a48"], "specs": ["256 GB", "A18 Pro", "6.9\" OLED", "48 MP"], "desc": "Titan korpus, Camera Control tugmasi va eng kuchli A18 Pro protsessor."},
+    {"id": "ip16", "cat": "apple", "type": "phone", "name": "iPhone 16", "price": 11900000, "colors": ["#a7c4e8", "#3e5f8a"], "specs": ["128 GB", "A18", "6.1\" OLED", "48 MP"], "desc": "Yangi Action tugmasi, Apple Intelligence va yorqin ranglar."},
+    {"id": "ip15", "cat": "apple", "type": "phone", "name": "iPhone 15", "price": 9400000, "old": 10200000, "badge": "-8%", "colors": ["#f3d3dc", "#b77d8d"], "specs": ["128 GB", "A16", "6.1\" OLED", "USB-C"], "desc": "Dynamic Island va 48 MP kamera bilan ishonchli tanlov."},
+    {"id": "s24u", "cat": "samsung", "type": "phone", "name": "Galaxy S24 Ultra", "price": 15500000, "badge": "Top", "colors": ["#9aa0a6", "#3c4043"], "specs": ["256 GB", "Snapdragon 8 Gen 3", "6.8\" AMOLED", "200 MP"], "desc": "S Pen, Galaxy AI va 200 MP kamera — flagman darajasidagi tajriba."},
+    {"id": "s24", "cat": "samsung", "type": "phone", "name": "Galaxy S24", "price": 9900000, "colors": ["#e8d9a8", "#8f7b3e"], "specs": ["256 GB", "Exynos 2400", "6.2\" AMOLED", "50 MP"], "desc": "Ixcham flagman, Galaxy AI imkoniyatlari bilan."},
+    {"id": "a55", "cat": "samsung", "type": "phone", "name": "Galaxy A55", "price": 4900000, "colors": ["#c8b6e2", "#5d4a82"], "specs": ["128 GB", "Exynos 1480", "6.6\" AMOLED", "50 MP"], "desc": "Metall ramka, IP67 himoya va ajoyib ekran."},
+    {"id": "x14", "cat": "xiaomi", "type": "phone", "name": "Xiaomi 14", "price": 8900000, "badge": "Leica", "colors": ["#2b2b2b", "#0d0d0d"], "specs": ["256 GB", "Snapdragon 8 Gen 3", "6.36\" AMOLED", "Leica 50 MP"], "desc": "Leica optikasi bilan professional suratlar."},
+    {"id": "rn13p", "cat": "xiaomi", "type": "phone", "name": "Redmi Note 13 Pro", "price": 3900000, "old": 4300000, "badge": "Hit", "colors": ["#9fd8c8", "#2f7a66"], "specs": ["256 GB", "Helio G99 Ultra", "6.67\" AMOLED", "200 MP"], "desc": "Narx va sifatning eng yaxshi muvozanati."},
+    {"id": "airpods", "cat": "acc", "type": "acc", "icon": "🎧", "name": "AirPods Pro 2", "price": 3100000, "colors": ["#f5f5f7", "#b9b9c0"], "specs": ["ANC", "USB-C", "6 soat"], "desc": "Faol shovqinni bostirish va fazoviy audio."},
+    {"id": "charger", "cat": "acc", "type": "acc", "icon": "⚡", "name": "Tez quvvatlagich 45W", "price": 290000, "colors": ["#ffd27a", "#c7861b"], "specs": ["45W", "USB-C", "PD 3.0"], "desc": "Samsung va iPhone uchun tezkor quvvatlash."},
+    {"id": "watch", "cat": "acc", "type": "acc", "icon": "⌚", "name": "Galaxy Watch 7", "price": 3400000, "colors": ["#b8c6db", "#4b5d78"], "specs": ["44 mm", "AMOLED", "GPS"], "desc": "Sog'liq monitoringi va zamonaviy dizayn."},
+    {"id": "case", "cat": "acc", "type": "acc", "icon": "🛡️", "name": "Premium chexol", "price": 150000, "colors": ["#e3c49a", "#8a6234"], "specs": ["MagSafe", "Teri", "Barcha modellar"], "desc": "Telefoningizni nafis himoya qiladi."}
+  ],
+  "services": [
+    {"icon": "⚙️", "name": "Proshivka va o'zbekcha menyu", "price": "50 000 – 100 000 so'm"},
+    {"icon": "🔓", "name": "FRP / Mi / Samsung Account blokdan chiqarish", "price": "80 000 – 200 000 so'm"},
+    {"icon": "☁️", "name": "iCloud / Passcode muammolari", "price": "Modelga qarab"},
+    {"icon": "💾", "name": "O'chgan ma'lumotlarni tiklash", "price": "100 000 so'mdan"},
+    {"icon": "🔁", "name": "Bootloop tuzatish", "price": "80 000 – 150 000 so'm"},
+    {"icon": "🔬", "name": "Plata ta'mirlash, chip almashtirish", "price": "Diagnostikadan so'ng"},
+    {"icon": "📱", "name": "Ekran va batareya almashtirish", "price": "Modelga qarab"}
+  ]
+}

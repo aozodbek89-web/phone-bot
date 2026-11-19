@@ -1,0 +1,278 @@
+<!doctype html>
+<html lang="uz">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+<title>Phone Store</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#07070b; --card:#12121a; --card2:#1a1a25; --line:rgba(255,255,255,.07);
+  --text:#f5f3ee; --muted:#8c8a96; --gold:#e8c27a; --gold2:#b8862f;
+  --grad:linear-gradient(135deg,#f3d58f 0%,#c9963f 100%);
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;margin:0}
+html,body{background:var(--bg);color:var(--text);font:15px/1.45 Manrope,-apple-system,system-ui,sans-serif}
+body{padding-bottom:calc(84px + env(safe-area-inset-bottom));min-height:100vh;
+  background:radial-gradient(600px 380px at 85% -80px,rgba(232,194,122,.16),transparent 70%),radial-gradient(500px 300px at -10% 30%,rgba(120,90,255,.08),transparent 70%),var(--bg)}
+a{color:inherit;text-decoration:none} button,input,textarea{font:inherit;color:inherit;border:0;background:none;outline:none}
+button{cursor:pointer}
+.wrap{padding:18px 16px}
+.top{display:flex;justify-content:space-between;align-items:center}
+.logo{font-weight:800;font-size:20px;letter-spacing:-.3px}
+.logo b{background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+.hi{color:var(--muted);font-size:13px}
+.icon-btn{width:42px;height:42px;border-radius:14px;background:var(--card);border:1px solid var(--line);display:grid;place-items:center;font-size:18px;position:relative}
+.dot{position:absolute;top:-5px;right:-5px;min-width:19px;height:19px;padding:0 5px;border-radius:10px;background:var(--grad);color:#1a1205;font-size:11px;font-weight:800;display:grid;place-items:center}
+.search{margin-top:16px;display:flex;align-items:center;gap:10px;padding:0 14px;height:48px;border-radius:16px;background:var(--card);border:1px solid var(--line)}
+.search input{flex:1;min-width:0} .search input::placeholder{color:var(--muted)}
+.hero{margin-top:16px;border-radius:24px;padding:20px;position:relative;overflow:hidden;min-height:168px;
+  background:linear-gradient(135deg,#2a2112 0%,#14110b 55%,#0d0c0a 100%);border:1px solid rgba(232,194,122,.22)}
+.hero:after{content:"";position:absolute;width:260px;height:260px;right:-90px;top:-90px;border-radius:50%;background:radial-gradient(circle,rgba(232,194,122,.35),transparent 65%)}
+.hero .tag{display:inline-block;font-size:11px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:var(--gold);padding:5px 10px;border:1px solid rgba(232,194,122,.35);border-radius:999px}
+.hero h1{font-size:23px;line-height:1.2;margin:12px 0 6px;max-width:60%;font-weight:800;letter-spacing:-.4px}
+.hero p{color:#bdb6a6;font-size:13px;max-width:58%}
+.hero .ph{position:absolute;right:14px;bottom:-70px;width:112px;z-index:1;transform:rotate(-12deg);filter:drop-shadow(0 20px 30px rgba(0,0,0,.6))}
+.hero .cta{display:inline-flex;margin-top:14px;padding:9px 16px;border-radius:12px;background:var(--grad);color:#1a1205;font-weight:800;font-size:13px;position:relative;z-index:2}
+.chips{display:flex;gap:8px;overflow-x:auto;margin:20px -16px 0;padding:0 16px;scrollbar-width:none}
+.chips::-webkit-scrollbar{display:none}
+.chip{white-space:nowrap;padding:10px 16px;border-radius:14px;background:var(--card);border:1px solid var(--line);font-weight:600;font-size:13px;color:#cfccd6;transition:.2s}
+.chip.on{background:var(--grad);color:#1a1205;border-color:transparent}
+.sec{display:flex;justify-content:space-between;align-items:baseline;margin:22px 0 12px}
+.sec h2{font-size:18px;font-weight:800;letter-spacing:-.3px} .sec span{color:var(--muted);font-size:13px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.card{background:linear-gradient(180deg,var(--card2),var(--card));border:1px solid var(--line);border-radius:22px;padding:10px 10px 12px;position:relative;overflow:hidden;animation:up .4s both}
+@keyframes up{from{opacity:0;transform:translateY(10px)}}
+.card .vis{height:150px;border-radius:16px;display:grid;place-items:center;position:relative;overflow:hidden}
+.card .vis svg{height:128px;filter:drop-shadow(0 12px 16px rgba(0,0,0,.5))}
+.card .vis .emo{font-size:62px;filter:drop-shadow(0 10px 14px rgba(0,0,0,.45))}
+.badge{position:absolute;top:10px;left:10px;z-index:2;font-size:10.5px;font-weight:800;padding:4px 8px;border-radius:8px;background:rgba(0,0,0,.55);backdrop-filter:blur(8px);color:var(--gold);border:1px solid rgba(232,194,122,.3)}
+.card .n{font-weight:700;font-size:14px;margin:10px 2px 2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.card .s{color:var(--muted);font-size:11.5px;margin:0 2px}
+.card .pr{display:flex;align-items:flex-end;justify-content:space-between;margin:8px 2px 0}
+.price{font-weight:800;font-size:14.5px;white-space:nowrap} .old{color:var(--muted);text-decoration:line-through;font-size:11px;display:block;font-weight:500}
+.add{position:absolute;right:16px;top:124px;z-index:2;box-shadow:0 6px 16px rgba(0,0,0,.4);width:34px;height:34px;border-radius:11px;background:var(--grad);color:#1a1205;font-weight:800;font-size:20px;display:grid;place-items:center;flex:none}
+.nav{position:fixed;left:12px;right:12px;bottom:calc(10px + env(safe-area-inset-bottom));display:flex;padding:6px;border-radius:22px;background:rgba(22,22,30,.82);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border:1px solid var(--line);z-index:10}
+.nav a{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:7px 0;border-radius:16px;font-size:10.5px;font-weight:600;color:var(--muted);position:relative}
+.nav a i{font-style:normal;font-size:19px;filter:grayscale(1);opacity:.7}
+.nav a.on{background:rgba(232,194,122,.12);color:var(--gold)} .nav a.on i{filter:none;opacity:1}
+.dot[hidden]{display:none}
+.nav .dot{top:2px;right:calc(50% - 22px)}
+/* product */
+.pv{height:340px;margin:-18px -16px 0;display:grid;place-items:center;position:relative;overflow:hidden}
+.pv svg{height:270px;filter:drop-shadow(0 30px 40px rgba(0,0,0,.6));animation:fl 4s ease-in-out infinite}
+.pv .emo{font-size:130px;animation:fl 4s ease-in-out infinite}
+@keyframes fl{50%{transform:translateY(-8px)}}
+.back{position:absolute;top:16px;left:16px;z-index:3}
+.ptitle{font-size:25px;font-weight:800;letter-spacing:-.5px;margin-top:6px}
+.pprice{display:flex;align-items:baseline;gap:10px;margin-top:6px}
+.pprice .price{font-size:22px;background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+.specs{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:18px}
+.spec{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:11px 12px;font-weight:700;font-size:13px}
+.spec small{display:block;color:var(--muted);font-weight:500;font-size:11px;margin-bottom:2px}
+.pdesc{color:#c4c1cc;margin-top:16px;font-size:14px}
+.perks{display:flex;gap:8px;margin-top:16px}
+.perk{flex:1;text-align:center;font-size:11px;color:var(--muted);padding:10px 4px;border-radius:14px;background:var(--card);border:1px solid var(--line)}
+.perk b{display:block;font-size:18px;margin-bottom:2px}
+.bigbtn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;height:54px;border-radius:18px;background:var(--grad);color:#1a1205;font-weight:800;font-size:15.5px;box-shadow:0 10px 30px rgba(201,150,63,.3)}
+.bigbtn.ghost{background:var(--card);color:var(--text);box-shadow:none;border:1px solid var(--line)}
+.sticky{position:sticky;bottom:calc(86px + env(safe-area-inset-bottom));margin-top:20px;z-index:5;padding-top:12px;background:linear-gradient(transparent,var(--bg) 40%)}
+/* cart */
+.ci{display:flex;gap:12px;align-items:center;background:var(--card);border:1px solid var(--line);border-radius:20px;padding:10px;margin-bottom:10px}
+.ci .th{width:70px;height:70px;border-radius:14px;display:grid;place-items:center;flex:none;overflow:hidden}
+.ci .th svg{height:58px} .ci .th .emo{font-size:32px}
+.ci .info{flex:1;min-width:0} .ci .n{font-weight:700;font-size:14px}
+.qty{display:flex;align-items:center;gap:10px;margin-top:6px}
+.qty button{width:28px;height:28px;border-radius:9px;background:var(--card2);border:1px solid var(--line);font-weight:800}
+.sum{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:16px;margin-top:6px}
+.sum div{display:flex;justify-content:space-between;color:var(--muted);font-size:14px;margin:4px 0}
+.sum .t{color:var(--text);font-size:18px;font-weight:800;margin-top:10px;padding-top:10px;border-top:1px dashed var(--line)}
+.field{display:block;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:10px 14px;margin-top:10px}
+.field small{display:block;color:var(--muted);font-size:11px} .field input,.field textarea{width:100%;padding-top:2px}
+.seg{display:flex;gap:6px;margin-top:10px;background:var(--card);border:1px solid var(--line);padding:5px;border-radius:16px}
+.seg button{flex:1;padding:10px;border-radius:12px;font-weight:700;font-size:13px;color:var(--muted)}
+.seg button.on{background:var(--card2);color:var(--gold);border:1px solid rgba(232,194,122,.25)}
+.empty{text-align:center;padding:60px 20px;color:var(--muted)} .empty b{display:block;font-size:56px;margin-bottom:10px}
+/* services */
+.srv{display:flex;gap:14px;align-items:center;background:linear-gradient(180deg,var(--card2),var(--card));border:1px solid var(--line);border-radius:20px;padding:14px;margin-bottom:10px;animation:up .4s both}
+.srv .ic{width:48px;height:48px;border-radius:15px;display:grid;place-items:center;font-size:22px;background:rgba(232,194,122,.1);border:1px solid rgba(232,194,122,.2);flex:none}
+.srv .n{font-weight:700;font-size:14px} .srv .p{color:var(--gold);font-size:12.5px;font-weight:600;margin-top:2px}
+.cic{width:48px;height:48px;border-radius:15px;display:grid;place-items:center;font-size:22px;background:rgba(232,194,122,.1);border:1px solid rgba(232,194,122,.2);flex:none}
+.contact{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:16px;margin-bottom:10px;display:flex;gap:14px;align-items:center}
+.toast{position:fixed;left:50%;top:18px;transform:translate(-50%,-80px);background:rgba(30,30,40,.95);border:1px solid rgba(232,194,122,.3);padding:12px 18px;border-radius:14px;font-weight:700;font-size:13px;z-index:20;transition:.35s;white-space:nowrap}
+.toast.show{transform:translate(-50%,0)}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<nav class="nav">
+  <a href="#/" data-k="home"><i>🛍</i>Do'kon</a>
+  <a href="#/services" data-k="services"><i>🛠</i>Servis</a>
+  <a href="#/cart" data-k="cart"><i>🛒</i>Savatcha<span class="dot" id="navdot" hidden></span></a>
+  <a href="#/contact" data-k="contact"><i>📍</i>Aloqa</a>
+</nav>
+<div class="toast" id="toast"></div>
+<script>
+const tg = window.Telegram && window.Telegram.WebApp;
+try { tg.ready(); tg.expand(); tg.setHeaderColor('#07070b'); tg.setBackgroundColor('#07070b'); } catch(e){}
+const $ = s => document.querySelector(s), $app = $('#app');
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const money = n => n.toLocaleString('ru-RU').replace(/ /g,' ') + " so'm";
+const store = { get(k,d){ try{ const v=localStorage.getItem('s_'+k); return v?JSON.parse(v):d; }catch(e){ return d; } },
+                set(k,v){ try{ localStorage.setItem('s_'+k, JSON.stringify(v)); }catch(e){} } };
+const haptic = (t='light') => { try { tg.HapticFeedback.impactOccurred(t); } catch(e){} };
+let DB, cat = 'all', query = '', cart = store.get('cart', {}), delivery = false;
+
+function toast(msg){ const t = $('#toast'); t.textContent = msg; t.classList.add('show'); clearTimeout(t._h); t._h = setTimeout(()=>t.classList.remove('show'), 1800); }
+function cartCount(){ return Object.values(cart).reduce((a,b)=>a+b,0); }
+function saveCart(){ store.set('cart', cart); const d = $('#navdot'), c = cartCount(); d.hidden = !c; d.textContent = c; }
+
+// ---- Premium phone render (SVG) ----
+function phoneSvg(p, uid){
+  const [c1, c2] = p.colors, id = 'g' + uid;
+  const brand = p.cat;
+  let cam = '';
+  if (brand === 'apple') cam = `<rect x="14" y="14" width="56" height="58" rx="16" fill="${c2}" opacity=".55" stroke="rgba(255,255,255,.25)"/>
+    ${[[30,30],[30,56],[54,43]].map(([x,y])=>`<circle cx="${x}" cy="${y}" r="10.5" fill="#0b0b0f" stroke="#555" stroke-width="2"/><circle cx="${x-3}" cy="${y-3}" r="3" fill="#3b4a6b"/>`).join('')}
+    <circle cx="57" cy="24" r="3.5" fill="#f4e7c6" opacity=".8"/>`;
+  else if (brand === 'samsung') cam = [24,48,72].map(y=>`<circle cx="22" cy="${y}" r="9.5" fill="#0b0b0f" stroke="rgba(255,255,255,.35)" stroke-width="2"/><circle cx="19.5" cy="${y-2.5}" r="2.6" fill="#3b4a6b"/>`).join('') + `<circle cx="40" cy="22" r="3" fill="#f4e7c6" opacity=".7"/>`;
+  else cam = `<rect x="14" y="14" width="60" height="60" rx="18" fill="#111" stroke="rgba(255,255,255,.2)"/>
+    ${[[30,30],[58,30],[30,58],[58,58]].map(([x,y],i)=> i===3?`<circle cx="${x}" cy="${y}" r="4" fill="#f4e7c6" opacity=".7"/>`:`<circle cx="${x}" cy="${y}" r="10" fill="#050507" stroke="#666" stroke-width="2"/><circle cx="${x-3}" cy="${y-3}" r="2.6" fill="#3b4a6b"/>`).join('')}`;
+  return `<svg viewBox="0 0 120 240" xmlns="http://www.w3.org/2000/svg"><defs>
+    <linearGradient id="${id}" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="${c1}"/><stop offset="1" stop-color="${c2}"/></linearGradient>
+    <linearGradient id="${id}s" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#fff" stop-opacity=".35"/><stop offset=".3" stop-color="#fff" stop-opacity="0"/></linearGradient></defs>
+    <rect x="2" y="2" width="116" height="236" rx="24" fill="${c2}"/>
+    <rect x="4" y="4" width="112" height="232" rx="22" fill="url(#${id})"/>
+    <rect x="4" y="4" width="112" height="232" rx="22" fill="url(#${id}s)"/>
+    ${cam}
+    <text x="60" y="160" text-anchor="middle" font-family="Manrope,sans-serif" font-size="9" font-weight="700" fill="rgba(0,0,0,.28)" letter-spacing="2">${brand==='apple'?'':brand==='samsung'?'SAMSUNG':'XIAOMI'}</text>
+    ${brand==='apple'?`<path d="M60 150c-2-2.4-1.6-5.5.6-7.4M63.8 155c2.4-.2 4.4 1.2 5 1-1 3-3 6-5 6-1.6 0-2-1-3.8-1s-2.4 1-3.8 1c-2.4 0-5.4-5-5.4-9 0-3.4 2.4-5.4 4.6-5.4 1.6 0 2.8 1 3.8 1s2.6-1.2 4.4-1c1 0 2.8.4 4 2-1.6 1-2.6 2.6-2.6 4.6" fill="rgba(0,0,0,.25)"/>`:''}
+  </svg>`;
+}
+function visual(p, uid, cls='vis'){
+  const [c1, c2] = p.colors;
+  const bg = `background:radial-gradient(circle at 50% 60%, ${c1}40, transparent 62%),linear-gradient(160deg,#1d1d28,#101016)`;
+  return `<div class="${cls}" style="${bg}">${p.type==='phone' ? phoneSvg(p, uid) : `<span class="emo">${p.icon}</span>`}</div>`;
+}
+
+// ---- Views ----
+function productCard(p, i){
+  return `<a class="card" href="#/p/${p.id}" style="animation-delay:${i*40}ms">
+    ${p.badge?`<span class="badge">${esc(p.badge)}</span>`:''}${visual(p, 'c'+p.id)}
+    <div class="n">${esc(p.name)}</div><div class="s">${esc(p.specs.slice(0,2).join(' · '))}</div>
+    <div class="pr"><div>${p.old?`<span class="old">${money(p.old)}</span>`:''}<span class="price">${money(p.price)}</span></div>
+    <button class="add" onclick="event.preventDefault();addToCart('${p.id}')">+</button></div></a>`;
+}
+function drawGrid(){
+  const q = query.toLowerCase();
+  const list = DB.products.filter(p => (cat==='all' || p.cat===cat) && (!q || p.name.toLowerCase().includes(q)));
+  $('#grid').innerHTML = list.length ? list.map(productCard).join('') : '<div class="empty" style="grid-column:1/-1"><b>🔎</b>Hech narsa topilmadi</div>';
+  $('#cnt').textContent = list.length + ' ta mahsulot';
+}
+function viewHome(){
+  const u = tg && tg.initDataUnsafe && tg.initDataUnsafe.user;
+  const hero = DB.products[0];
+  $app.innerHTML = `<div class="wrap">
+    <div class="top"><div><div class="hi">Xush kelibsiz${u?', '+esc(u.first_name):''} 👋</div><div class="logo">${esc(DB.shop.name.split(' ')[0])} <b>${esc(DB.shop.name.split(' ').slice(1).join(' '))}</b></div></div>
+      <a class="icon-btn" href="#/cart">🛒${cartCount()?`<span class="dot">${cartCount()}</span>`:''}</a></div>
+    <label class="search">🔍<input id="q" placeholder="Smartfon yoki aksessuar qidirish" value="${esc(query)}"></label>
+    <a class="hero" href="#/p/${hero.id}" style="display:block"><span class="tag">✦ Yangi kolleksiya</span>
+      <h1>${esc(hero.name)}</h1><p>Rasmiy kafolat · Bo'lib to'lash imkoniyati</p><span class="cta">Ko'rish →</span>
+      <div class="ph">${phoneSvg(hero,'hero')}</div></a>
+    <div class="chips">${DB.categories.map(c=>`<button class="chip ${c.id===cat?'on':''}" data-c="${c.id}">${esc(c.name)}</button>`).join('')}</div>
+    <div class="sec"><h2>Mahsulotlar</h2><span id="cnt"></span></div>
+    <div class="grid" id="grid"></div></div>`;
+  drawGrid();
+  $('#q').oninput = e => { query = e.target.value; drawGrid(); };
+  document.querySelector('.chips').onclick = e => { const b = e.target.closest('[data-c]'); if(!b) return; cat = b.dataset.c; haptic();
+    document.querySelectorAll('.chip').forEach(x=>x.classList.toggle('on', x===b)); drawGrid(); };
+}
+function viewProduct(id){
+  const p = DB.products.find(x=>x.id===id); if(!p) return location.hash = '#/';
+  const labels = p.type==='phone' ? ['Xotira','Protsessor','Ekran','Kamera'] : ['','','',''];
+  $app.innerHTML = `<div class="wrap">
+    <a class="icon-btn back" href="javascript:history.back()">←</a>
+    ${visual(p,'big','pv')}
+    ${p.badge?`<span class="badge" style="position:static;display:inline-block">${esc(p.badge)}</span>`:''}
+    <div class="ptitle">${esc(p.name)}</div>
+    <div class="pprice"><span class="price">${money(p.price)}</span>${p.old?`<span class="old" style="display:inline">${money(p.old)}</span>`:''}</div>
+    <div class="specs">${p.specs.map((s,i)=>`<div class="spec">${labels[i]?`<small>${labels[i]}</small>`:''}${esc(s)}</div>`).join('')}</div>
+    <p class="pdesc">${esc(p.desc)}</p>
+    <div class="perks"><div class="perk"><b>🛡</b>Kafolat</div><div class="perk"><b>🚚</b>Yetkazish</div><div class="perk"><b>💳</b>Bo'lib to'lash</div></div>
+    <div class="sticky"><button class="bigbtn" onclick="addToCart('${p.id}')">🛒 Savatga qo'shish</button></div></div>`;
+}
+function viewCart(){
+  const items = Object.entries(cart).map(([id,q])=>({p:DB.products.find(x=>x.id===id), q})).filter(x=>x.p);
+  if (!items.length) { $app.innerHTML = `<div class="wrap"><div class="sec"><h2>Savatcha</h2></div><div class="empty"><b>🛒</b>Savatchangiz hozircha bo'sh<br><br><a class="bigbtn" href="#/">Xaridni boshlash</a></div></div>`; return; }
+  const total = items.reduce((s,x)=>s+x.p.price*x.q, 0);
+  const u = (tg && tg.initDataUnsafe && tg.initDataUnsafe.user) || {};
+  const saved = store.get('form', {});
+  $app.innerHTML = `<div class="wrap"><div class="sec"><h2>Savatcha</h2><span>${cartCount()} ta</span></div>
+    ${items.map(({p,q})=>`<div class="ci">${visual(p,'t'+p.id,'th')}<div class="info"><div class="n">${esc(p.name)}</div>
+      <div class="price" style="font-size:13.5px;margin-top:2px">${money(p.price*q)}</div>
+      <div class="qty"><button onclick="setQty('${p.id}',-1)">−</button><b>${q}</b><button onclick="setQty('${p.id}',1)">+</button></div></div></div>`).join('')}
+    <div class="seg"><button class="${!delivery?'on':''}" onclick="delivery=false;viewCart()">🏬 Olib ketish</button><button class="${delivery?'on':''}" onclick="delivery=true;viewCart()">🚚 Yetkazish</button></div>
+    <label class="field"><small>Ismingiz</small><input id="fn" value="${esc(saved.name || u.first_name || '')}" placeholder="Ism"></label>
+    <label class="field"><small>Telefon raqam</small><input id="fp" type="tel" value="${esc(saved.phone || '+998 ')}" placeholder="+998 90 123 45 67"></label>
+    <label class="field"><small>${delivery?'Manzil va izoh':'Izoh (ixtiyoriy)'}</small><textarea id="fc" rows="2" placeholder="${delivery?'Shahar, ko\'cha, uy':'Masalan: rangi, xotira hajmi'}"></textarea></label>
+    <div class="sum"><div><span>Mahsulotlar</span><span>${money(total)}</span></div><div><span>Yetkazib berish</span><span>${delivery?'Kelishiladi':'Bepul'}</span></div>
+      <div class="t"><span>Jami</span><span>${money(total)}</span></div></div>
+    <div class="sticky"><button class="bigbtn" id="ob">✓ Buyurtma berish</button></div></div>`;
+  $('#ob').onclick = submitOrder;
+}
+async function submitOrder(){
+  const name = $('#fn').value.trim(), phone = $('#fp').value.trim(), comment = $('#fc').value.trim();
+  if (name.length < 2) return toast('✏️ Ismingizni kiriting');
+  if (phone.replace(/\D/g,'').length < 9) return toast('📞 Telefon raqamni kiriting');
+  store.set('form', {name, phone});
+  const b = $('#ob'); b.disabled = true; b.textContent = 'Yuborilmoqda...';
+  try {
+    const r = await fetch('/api/order', {method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({initData: tg ? tg.initData : '', items:Object.entries(cart).map(([id,qty])=>({id,qty})), name, phone, comment, delivery})});
+    const d = await r.json();
+    if (!d.ok) throw new Error(d.error);
+    haptic('heavy'); cart = {}; saveCart();
+    $app.innerHTML = `<div class="wrap"><div class="empty"><b>🎉</b><h2 style="color:var(--text);margin-bottom:8px">Buyurtma qabul qilindi!</h2>
+      Jami: <b style="display:inline;font-size:inherit;color:var(--gold)">${money(d.total)}</b><br>Operatorimiz tez orada siz bilan bog'lanadi.<br><br>
+      <a class="bigbtn" href="#/">Do'konga qaytish</a></div></div>`;
+  } catch(e){ toast('⚠️ ' + (e.message || 'Xatolik, qayta urining')); b.disabled = false; b.textContent = '✓ Buyurtma berish'; }
+}
+function viewServices(){
+  $app.innerHTML = `<div class="wrap"><div class="sec"><h2>Ta'mirlash va servis</h2></div>
+    <div class="hero" style="min-height:0;margin:0 0 14px"><span class="tag">✦ Usta-dasturchi</span><h1 style="max-width:100%;font-size:20px">Telefoningizni professional ustaga ishoning</h1>
+      <p style="max-width:100%">Tezkor diagnostika · Kafolatli ta'mir · Original ehtiyot qismlar</p></div>
+    ${DB.services.map((s,i)=>`<div class="srv" style="animation-delay:${i*40}ms"><div class="ic">${s.icon}</div><div><div class="n">${esc(s.name)}</div><div class="p">${esc(s.price)}</div></div></div>`).join('')}
+    <a class="bigbtn" style="margin-top:14px" href="https://t.me/${esc(DB.shop.telegram)}" onclick="return openTg(this.href)">💬 Ustaga yozish</a></div>`;
+}
+function viewContact(){
+  const s = DB.shop;
+  $app.innerHTML = `<div class="wrap"><div class="sec"><h2>Biz bilan aloqa</h2></div>
+    <div class="contact"><div class="cic">📍</div><div><b>Manzil</b><div class="hi">${esc(s.address)}</div></div></div>
+    <a class="contact" href="tel:${esc(s.phone)}"><div class="cic">📞</div><div><b>Telefon</b><div class="hi">${esc(s.phone.replace(/(\+998)(\d\d)(\d{3})(\d\d)(\d\d)/,'$1 $2 $3 $4 $5'))}</div></div></a>
+    <a class="contact" href="https://t.me/${esc(s.telegram)}" onclick="return openTg(this.href)"><div class="cic">✈️</div><div><b>Telegram</b><div class="hi">@${esc(s.telegram)}</div></div></a>
+    <div class="contact"><div class="cic">🕘</div><div><b>Ish vaqti</b><div class="hi">Har kuni 09:00 – 20:00</div></div></div></div>`;
+}
+function openTg(url){ try { tg.openTelegramLink(url); return false; } catch(e){ return true; } }
+function addToCart(id){ cart[id] = (cart[id]||0) + 1; saveCart(); haptic('medium'); toast('✓ Savatga qo\'shildi'); const d=document.querySelector('.top .icon-btn'); if(d) d.innerHTML = `🛒<span class="dot">${cartCount()}</span>`; }
+function setQty(id, d){ cart[id] = (cart[id]||0) + d; if (cart[id] <= 0) delete cart[id]; saveCart(); haptic(); viewCart(); }
+
+function route(){
+  const parts = (location.hash.slice(1) || '/').split('/').filter(Boolean), k = parts[0] || 'home';
+  document.querySelectorAll('.nav a').forEach(a => a.classList.toggle('on', a.dataset.k === k));
+  try { k==='p' ? tg.BackButton.show() : tg.BackButton.hide(); } catch(e){}
+  window.scrollTo(0,0);
+  if (k==='p') return viewProduct(parts[1]);
+  if (k==='cart') return viewCart();
+  if (k==='services') return viewServices();
+  if (k==='contact') return viewContact();
+  viewHome();
+}
+try { tg.BackButton.onClick(() => history.back()); } catch(e){}
+window.addEventListener('hashchange', route);
+fetch('/products.json').then(r=>r.json()).then(d => { DB = d; saveCart(); route(); })
+  .catch(() => $app.innerHTML = '<div class="empty"><b>⚠️</b>Yuklab bo\'lmadi. Qayta oching.</div>');
+</script>
+</body>
+</html>
