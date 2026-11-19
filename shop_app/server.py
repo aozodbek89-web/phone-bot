@@ -63,6 +63,12 @@ async def order(request: web.Request) -> web.Response:
     cat = catalog()
     items = {p["id"]: p for p in cat["products"]}
     sims = dict(cat["sims"])
+    pays = cat["payments"]
+    try:
+        pay = max(0, min(int(body.get("pay", 0)), len(pays) - 1))
+    except (TypeError, ValueError):
+        pay = 0
+    pay_name, markup, months = pays[pay]
     lines, total = [], 0
     for it in body.get("items", [])[:50]:
         p = items.get(str(it.get("id")))
@@ -75,6 +81,7 @@ async def order(request: web.Request) -> web.Response:
         if m not in mem or sim not in sims:
             continue
         price = p["price"] + mem[m] + (0 if p.get("sim") else sims[sim])
+        price = round(price * (100 + markup) / 100 / 1000) * 1000
         qty = max(1, min(int(it.get("qty", 1)), 20))
         total += price * qty
         lines.append(f"• {p['name']} {m}, {color}, {sim} × {qty} — {money(price * qty)}")
@@ -83,17 +90,19 @@ async def order(request: web.Request) -> web.Response:
     name = str(body.get("name", ""))[:80]
     phone = str(body.get("phone", ""))[:30]
     comment = str(body.get("comment", ""))[:300]
+    monthly = -(-total // months // 1000) * 1000 if months > 1 else 0
+    pay_text = f"💳 {pay_name} muddatli to'lov: oyiga {money(monthly)} × {months}" if monthly else "💵 Naqd to'lov"
     delivery = "🚚 Yetkazib berish" if body.get("delivery") else "🏬 Do'kondan olib ketish"
     uname = f"@{user['username']}" if user.get("username") else user.get("first_name", "")
     text = (f"🛒 YANGI BUYURTMA\n\n{chr(10).join(lines)}\n\n💰 Jami: {money(total)}\n\n"
-            f"👤 {name} ({uname})\n📞 {phone}\n{delivery}" + (f"\n💬 {comment}" if comment else ""))
+            f"{pay_text}\n👤 {name} ({uname})\n📞 {phone}\n{delivery}" + (f"\n💬 {comment}" if comment else ""))
     if ADMIN_CHAT_ID:
         await tg("sendMessage", chat_id=ADMIN_CHAT_ID, text=text)
     if user.get("id"):
         await tg("sendMessage", chat_id=user["id"],
-                 text=f"✅ Buyurtmangiz qabul qilindi!\n\n{chr(10).join(lines)}\n\n💰 Jami: {money(total)}\n\n"
+                 text=f"✅ Buyurtmangiz qabul qilindi!\n\n{chr(10).join(lines)}\n\n💰 Jami: {money(total)}\n{pay_text}\n\n"
                       "Tez orada operatorimiz siz bilan bog'lanadi. Rahmat! 🙏")
-    return web.json_response({"ok": True, "total": total})
+    return web.json_response({"ok": True, "total": total, "monthly": monthly, "months": months})
 
 
 # ---------------- Bot ----------------

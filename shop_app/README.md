@@ -1,7 +1,7 @@
 # 🛍 iPark — iPhone do'koni (Telegram Mini App)
 
 Premium qora-oltin dizayn. Faqat iPhone: avval iPhone 18 Pro Max (eSIM) va iPhone 18 Pro Max Dual SIM, keyin qolgan modellar.
-Rang / xotira / SIM turini tanlash, savatcha, buyurtma (sizga va mijozga Telegramda keladi), aloqa.
+Rang / xotira / SIM turini tanlash, naqd yoki 3 / 6 oylik muddatli to'lov (ustama `products.json` dagi `payments` da, mijozga foiz ko'rsatilmaydi), savatcha, buyurtma (sizga va mijozga Telegramda keladi), aloqa.
 
 | Do'kon | Mahsulot | Savatcha |
 |---|---|---|

@@ -113,6 +113,10 @@ button{cursor:pointer}
 .toast{position:fixed;left:50%;top:18px;transform:translate(-50%,-80px);background:rgba(30,30,40,.95);border:1px solid rgba(232,194,122,.3);padding:12px 18px;border-radius:14px;font-weight:700;font-size:13px;z-index:20;transition:.35s;white-space:nowrap}
 .toast.show{transform:translate(-50%,0)}
 
+.mo{color:var(--gold);font-size:11px;font-weight:600;margin:3px 2px 0}
+.permo{margin-top:8px;padding:10px 12px;border-radius:14px;background:rgba(232,194,122,.08);border:1px solid rgba(232,194,122,.2);font-size:13px;color:#d9d3c4}
+.permo b{color:var(--gold)}
+.ob.pay{display:grid;grid-template-columns:repeat(3,1fr)}
 .duo{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
 .mini{display:flex;gap:10px;align-items:center;padding:8px;border-radius:18px;background:linear-gradient(180deg,var(--card2),var(--card));border:1px solid rgba(232,194,122,.18)}
 .mini .mv{width:46px;height:62px;border-radius:12px;display:grid;place-items:center;flex:none} .mini .mv svg{height:54px}
@@ -133,11 +137,16 @@ try { tg.ready(); tg.expand(); tg.setHeaderColor('#07070b'); tg.setBackgroundCol
 const $ = s => document.querySelector(s), $app = $('#app');
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const money = n => n.toLocaleString('ru-RU').replace(/ /g,' ') + " so'm";
+const num = n => n.toLocaleString('ru-RU').replace(/\u00a0/g,' ');
 const mln = n => (n/1e6).toFixed(1).replace('.0','') + ' mln so\'m';
 const store = { get(k,d){ try{ const v=localStorage.getItem('ip_'+k); return v?JSON.parse(v):d; }catch(e){ return d; } },
                 set(k,v){ try{ localStorage.setItem('ip_'+k, JSON.stringify(v)); }catch(e){} } };
 const haptic = (t='light') => { try { tg.HapticFeedback.impactOccurred(t); } catch(e){} };
-let DB, cat = 'all', query = '', cart = store.get('cart', {}), delivery = false;
+let DB, cat = 'all', query = '', cart = store.get('cart', {}), delivery = false, pay = store.get('pay', 0);
+// to'lov turi: narxga ustama qo'shiladi (foiz ko'rsatilmaydi)
+const withPay = (price, i) => Math.round(price * (100 + DB.payments[i][1]) / 100 / 1000) * 1000;
+const monthly = (total, i) => Math.ceil(total / DB.payments[i][2] / 1000) * 1000;
+const payName = i => i ? DB.payments[i][0] + ' muddatli' : 'Naqd';
 
 function toast(msg){ const t = $('#toast'); t.textContent = msg; t.classList.add('show'); clearTimeout(t._h); t._h = setTimeout(()=>t.classList.remove('show'), 1800); }
 const byId = id => DB.products.find(x => x.id === id);
@@ -182,7 +191,8 @@ function productCard(p, i){
     ${p.badge?`<span class="badge">${esc(p.badge)}</span>`:''}${visual(p, 0, 'c'+p.id)}
     <button class="add" onclick="event.preventDefault();addToCart('${p.id}|0|0|0')">+</button>
     <div class="n">${esc(p.name)}</div><div class="s">${esc(p.mem[0][0])} dan · ${p.colors.length} rang</div>
-    <div class="pr"><div>${p.old?`<span class="old">${money(p.old)}</span>`:''}<span class="price">${money(p.price)}</span></div></div></a>`;
+    <div class="pr"><div>${p.old?`<span class="old">${money(p.old)}</span>`:''}<span class="price">${money(p.price)}</span></div></div>
+    <div class="mo">yoki ${money(monthly(withPay(p.price,2),2))} / oy</div></a>`;
 }
 function drawGrid(){
   const q = query.toLowerCase();
@@ -214,7 +224,7 @@ function viewHome(){
 }
 function viewProduct(id){
   const p = byId(id); if(!p) return location.hash = '#/';
-  const sel = { m:0, s:0, c:0 };
+  const sel = { m:0, s:0, c:0, p:pay };
   const sims = simList(p);
   const labels = ['Protsessor','Ekran','Kamera','Xususiyat'];
   const draw = () => {
@@ -224,7 +234,9 @@ function viewProduct(id){
       ${visual(p, sel.c, 'big', 'pv')}
       ${p.badge?`<span class="badge" style="position:static;display:inline-block">${esc(p.badge)}</span>`:''}
       <div class="ptitle">${esc(p.name)}</div>
-      <div class="pprice"><span class="price">${money(ln.price)}</span>${p.old && !sel.m ?`<span class="old" style="display:inline">${money(p.old)}</span>`:''}</div>
+      <div class="pprice"><span class="price">${money(withPay(ln.price, sel.p))}</span>${p.old && !sel.m && !sel.p ?`<span class="old" style="display:inline">${money(p.old)}</span>`:''}</div>
+      ${sel.p ? `<div class="permo">💳 ${DB.payments[sel.p][2]} oy davomida oyiga <b>${money(monthly(withPay(ln.price, sel.p), sel.p))}</b></div>` : ''}
+      <div class="opt"><small>To'lov turi</small><div class="ob pay">${DB.payments.map((x,i)=>`<button class="${i===sel.p?'on':''}" data-k="p" data-i="${i}">${i?'🗓 '+esc(x[0]):'💵 Naqd'}<small>${i?num(monthly(withPay(ln.price,i),i))+' / oy':num(ln.price)}</small></button>`).join('')}</div></div>
       <div class="opt"><small>Rang<span class="cname">${esc(p.colors[sel.c].n)}</span></small><div class="ob">${p.colors.map((c,i)=>`<button class="sw ${i===sel.c?'on':''}" data-k="c" data-i="${i}" style="background:linear-gradient(135deg,${c.c[0]},${c.c[1]})" aria-label="${esc(c.n)}"></button>`).join('')}</div></div>
       <div class="opt"><small>Xotira</small><div class="ob">${p.mem.map((m,i)=>`<button class="${i===sel.m?'on':''}" data-k="m" data-i="${i}">${esc(m[0])}${m[1]?`<small>+${money(m[1])}</small>`:''}</button>`).join('')}</div></div>
       <div class="opt"><small>SIM turi</small><div class="ob">${sims.map((s,i)=>`<button class="${i===sel.s?'on':''}" data-k="s" data-i="${i}">${s[0]==='eSIM'?'📶 eSIM':'📱 Dual SIM'}${s[1]?`<small>+${money(s[1])}</small>`:''}</button>`).join('')}
@@ -232,29 +244,32 @@ function viewProduct(id){
       <div class="specs">${p.specs.map((s,i)=>`<div class="spec"><small>${labels[i]}</small>${esc(s)}</div>`).join('')}</div>
       <p class="pdesc">${esc(p.desc)}</p>
       <div class="perks"><div class="perk"><b>🛡</b>Rasmiy kafolat</div><div class="perk"><b>✅</b>100% original</div><div class="perk"><b>💳</b>Bo'lib to'lash</div></div>
-      <div class="sticky"><button class="bigbtn" id="addb">🛒 Savatga qo'shish · ${money(ln.price)}</button></div></div>`;
+      <div class="sticky"><button class="bigbtn" id="addb">🛒 Savatga qo'shish · ${sel.p ? money(monthly(withPay(ln.price, sel.p), sel.p)) + ' / oy' : money(ln.price)}</button></div></div>`;
     document.querySelectorAll('[data-k]').forEach(b => b.onclick = () => { sel[b.dataset.k] = +b.dataset.i; haptic(); const y = scrollY; draw(); scrollTo(0, y); });
-    $('#addb').onclick = () => addToCart(`${p.id}|${sel.m}|${sel.s}|${sel.c}`);
+    $('#addb').onclick = () => { pay = sel.p; store.set('pay', pay); addToCart(`${p.id}|${sel.m}|${sel.s}|${sel.c}`); };
   };
   draw();
 }
 function viewCart(){
   const items = Object.entries(cart).map(([k,q]) => ({k, q, l:lineOf(k)})).filter(x => x.l);
   if (!items.length) { $app.innerHTML = `<div class="wrap"><div class="sec"><h2>Savatcha</h2></div><div class="empty"><b>🛒</b>Savatchangiz hozircha bo'sh<br><br><a class="bigbtn" href="#/">Xaridni boshlash</a></div></div>`; return; }
-  const total = items.reduce((s,x)=>s+x.l.price*x.q, 0);
+  const total = items.reduce((s,x)=>s+withPay(x.l.price, pay)*x.q, 0), months = DB.payments[pay][2];
   const u = (tg && tg.initDataUnsafe && tg.initDataUnsafe.user) || {};
   const saved = store.get('form', {});
   $app.innerHTML = `<div class="wrap"><div class="sec"><h2>Savatcha</h2><span>${cartCount()} ta</span></div>
     ${items.map(({k,q,l})=>`<div class="ci">${visual(l.p, k.split('|')[3], 't'+k.replace(/\W/g,''), 'th')}<div class="info"><div class="n">${esc(l.p.name)}</div>
       <div class="s" style="color:var(--muted);font-size:12px">${esc(l.mem[0])} · ${esc(l.color.n)} · ${esc(l.sim[0])}</div>
-      <div class="price" style="font-size:13.5px;margin-top:2px">${money(l.price*q)}</div>
+      <div class="price" style="font-size:13.5px;margin-top:2px">${money(withPay(l.price, pay)*q)}</div>
       <div class="qty"><button onclick="setQty('${k}',-1)">−</button><b>${q}</b><button onclick="setQty('${k}',1)">+</button></div></div></div>`).join('')}
+    <div class="opt" style="margin-top:6px"><small>To'lov turi</small></div>
+    <div class="seg" style="margin-top:0">${DB.payments.map((x,i)=>`<button class="${i===pay?'on':''}" onclick="setPay(${i})">${i?'🗓 '+esc(x[0]):'💵 Naqd'}</button>`).join('')}</div>
     <div class="seg"><button class="${!delivery?'on':''}" onclick="delivery=false;viewCart()">🏬 Olib ketish</button><button class="${delivery?'on':''}" onclick="delivery=true;viewCart()">🚚 Yetkazish</button></div>
     <label class="field"><small>Ismingiz</small><input id="fn" value="${esc(saved.name || u.first_name || '')}" placeholder="Ism"></label>
     <label class="field"><small>Telefon raqam</small><input id="fp" type="tel" value="${esc(saved.phone || '+998 ')}" placeholder="+998 90 123 45 67"></label>
     <label class="field"><small>${delivery?'Manzil va izoh':'Izoh (ixtiyoriy)'}</small><textarea id="fc" rows="2" placeholder="${delivery?'Shahar, ko\'cha, uy':'Masalan: qachon kelasiz'}"></textarea></label>
-    <div class="sum"><div><span>Mahsulotlar</span><span>${money(total)}</span></div><div><span>Yetkazib berish</span><span>${delivery?'Kelishiladi':'Bepul'}</span></div>
-      <div class="t"><span>Jami</span><span>${money(total)}</span></div></div>
+    <div class="sum"><div><span>To'lov turi</span><span>${esc(payName(pay))}</span></div><div><span>Yetkazib berish</span><span>${delivery?'Kelishiladi':'Bepul'}</span></div>
+      <div class="t"><span>Jami</span><span>${money(total)}</span></div>
+      ${months > 1 ? `<div class="t" style="border:0;margin-top:0;padding-top:4px;color:var(--gold)"><span>Oylik to'lov</span><span>${money(monthly(total, pay))} × ${months}</span></div>` : ''}</div>
     <div class="sticky"><button class="bigbtn" id="ob">✓ Buyurtma berish</button></div></div>`;
   $('#ob').onclick = submitOrder;
 }
@@ -267,12 +282,12 @@ async function submitOrder(){
   const b = $('#ob'); b.disabled = true; b.textContent = 'Yuborilmoqda...';
   try {
     const r = await fetch('/api/order', {method:'POST', headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({initData: tg ? tg.initData : '', items, name, phone, comment, delivery})});
+      body: JSON.stringify({initData: tg ? tg.initData : '', items, name, phone, comment, delivery, pay})});
     const d = await r.json();
     if (!d.ok) throw new Error(d.error);
     haptic('heavy'); cart = {}; saveCart();
     $app.innerHTML = `<div class="wrap"><div class="empty"><b>🎉</b><h2 style="color:var(--text);margin-bottom:8px">Buyurtma qabul qilindi!</h2>
-      Jami: <b style="display:inline;font-size:inherit;color:var(--gold)">${money(d.total)}</b><br>Operatorimiz tez orada siz bilan bog'lanadi.<br><br>
+      Jami: <b style="display:inline;font-size:inherit;color:var(--gold)">${money(d.total)}</b>${d.monthly?`<br>Oyiga: <b style="display:inline;font-size:inherit;color:var(--gold)">${money(d.monthly)} × ${d.months} oy</b>`:''}<br>Operatorimiz tez orada siz bilan bog'lanadi.<br><br>
       <a class="bigbtn" href="#/">Do'konga qaytish</a></div></div>`;
   } catch(e){ toast('⚠️ ' + (e.message || 'Xatolik, qayta urining')); b.disabled = false; b.textContent = '✓ Buyurtma berish'; }
 }
@@ -287,6 +302,7 @@ function viewContact(){
     <a class="bigbtn" style="margin-top:14px" href="tel:${esc(s.phone)}">📞 Qo'ng'iroq qilish</a></div>`;
 }
 function addToCart(key){ cart[key] = (cart[key]||0) + 1; saveCart(); haptic('medium'); toast('✓ Savatga qo\'shildi'); const d=document.querySelector('.top .icon-btn'); if(d) d.innerHTML = `🛒<span class="dot">${cartCount()}</span>`; }
+function setPay(i){ pay = i; store.set('pay', i); haptic(); viewCart(); }
 function setQty(k, d){ cart[k] = (cart[k]||0) + d; if (cart[k] <= 0) delete cart[k]; saveCart(); haptic(); viewCart(); }
 
 function route(){
