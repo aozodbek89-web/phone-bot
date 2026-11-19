@@ -1,7 +1,7 @@
-# 🛍 Telefon do'koni — Telegram Mini App
+# 🛍 iPark — iPhone do'koni (Telegram Mini App)
 
-Premium qora-oltin dizayn. Katalog (Apple / Samsung / Xiaomi / Aksessuarlar), qidiruv, mahsulot sahifasi,
-savatcha, buyurtma berish (buyurtma sizga va mijozga Telegramda keladi), ta'mirlash xizmatlari, aloqa.
+Premium qora-oltin dizayn. Faqat iPhone: avval iPhone 18 Pro Max (eSIM) va iPhone 18 Pro Max Dual SIM, keyin qolgan modellar.
+Rang / xotira / SIM turini tanlash, savatcha, buyurtma (sizga va mijozga Telegramda keladi), aloqa.
 
 | Do'kon | Mahsulot | Savatcha |
 |---|---|---|
@@ -17,4 +17,4 @@ savatcha, buyurtma berish (buyurtma sizga va mijozga Telegramda keladi), ta'mirl
 Bot menyusidagi "🛍 Do'kon" tugmasi va webhook avtomatik sozlanadi.
 
 ## Mahsulot va narxlarni o'zgartirish
-`shop_app/static/products.json` faylini tahrirlang (nomi, narxi, rangi, xususiyatlari). Narxlar namuna sifatida berilgan.
+`shop_app/static/products.json` faylini tahrirlang (nomi, narxi, xotira narxlari, ranglar, manzil, telefon). Narxlar namuna sifatida berilgan.

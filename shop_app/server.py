@@ -60,14 +60,24 @@ async def order(request: web.Request) -> web.Response:
     user = check_init_data(body.get("initData", "")) if BOT_TOKEN else {"id": 0, "first_name": "Test"}
     if user is None:
         return web.json_response({"ok": False, "error": "Iltimos, ilovani Telegram ichida oching"}, status=403)
-    items = {p["id"]: p for p in catalog()["products"]}
+    cat = catalog()
+    items = {p["id"]: p for p in cat["products"]}
+    sims = dict(cat["sims"])
     lines, total = [], 0
     for it in body.get("items", [])[:50]:
         p = items.get(str(it.get("id")))
+        if not p:
+            continue
+        mem = dict(p["mem"])
+        m = str(it.get("mem", p["mem"][0][0]))
+        sim = p.get("sim") or str(it.get("sim", "eSIM"))
+        color = next((c["n"] for c in p["colors"] if c["n"] == it.get("color")), p["colors"][0]["n"])
+        if m not in mem or sim not in sims:
+            continue
+        price = p["price"] + mem[m] + (0 if p.get("sim") else sims[sim])
         qty = max(1, min(int(it.get("qty", 1)), 20))
-        if p:
-            total += p["price"] * qty
-            lines.append(f"• {p['name']} × {qty} — {money(p['price'] * qty)}")
+        total += price * qty
+        lines.append(f"• {p['name']} {m}, {color}, {sim} × {qty} — {money(price * qty)}")
     if not lines:
         return web.json_response({"ok": False, "error": "Savatcha bo'sh"}, status=400)
     name = str(body.get("name", ""))[:80]
@@ -101,7 +111,8 @@ async def handle_update(upd: dict):
     kb = {"inline_keyboard": [[{"text": "🛍 Do'konni ochish", "web_app": {"url": PUBLIC_URL}}]]} if PUBLIC_URL else None
     await tg("sendMessage", chat_id=chat,
              text=f"Assalomu alaykum, {name}! 👋\n\n✨ {shop['name']} — {shop['tagline']}.\n\n"
-                  "Smartfonlar, aksessuarlar va ta'mirlash xizmatlari — barchasi bitta ilovada.",
+                  "📱 iPhone 18 Pro Max, Dual SIM va boshqa modellar — rasmiy kafolat bilan.\n"
+                  f"📍 {shop['address']}\n📞 {shop['phone']}",
              **({"reply_markup": kb} if kb else {}))
 
 
